@@ -1,3 +1,9 @@
+<div align="center">
+
+**中文** · [English](./README.en.md)
+
+</div>
+
 # deep-review-loop
 
 > 5 轮深度复检闭环（R0-R3 + V1-V5）+ 4 层过拟合防护。**审查 → 修复 → 重新审查**，直到连续 N 轮无新问题才判定收敛。

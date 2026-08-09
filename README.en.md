@@ -1,3 +1,9 @@
+<div align="center">
+
+[中文](./README.md) · **English**
+
+</div>
+
 # deep-review-loop
 
 > A 5-round deep review loop (R0-R3 + V1-V5) with 4-layer anti-overfit protection. **Review → fix → re-review** until N consecutive rounds find nothing new.
