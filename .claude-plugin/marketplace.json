@@ -1,0 +1,19 @@
+{
+  "name": "deep-review-loop",
+  "owner": {
+    "name": "1273984347"
+  },
+  "metadata": {
+    "description": "5-round deep review loop (R0-R3) with anti-overfit protection",
+    "version": "1.3.0"
+  },
+  "plugins": [
+    {
+      "name": "deep-review-loop",
+      "description": "5-round deep review loop with 4-layer anti-overfit protection for plans, specs, and skills",
+      "source": "./",
+      "strict": false,
+      "skills": ["./"]
+    }
+  ]
+}

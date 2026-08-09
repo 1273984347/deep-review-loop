@@ -16,9 +16,27 @@ LLM 在「批量修复、写长文档、改 skill 自身」后极易**假收敛*
 
 ## 安装
 
+标准 Agent Skill（`SKILL.md` + `references/`），任何支持 Agent Skills 的客户端都能装。三种方式任选：
+
+**方式 A：直接复制（通用）**
+
 ```bash
 git clone https://github.com/1273984347/deep-review-loop.git
 cp -r deep-review-loop <your-skills-dir>/deep-review-loop
+```
+
+**方式 B：Claude Code 插件市场（一条命令）**
+
+```text
+/plugin marketplace add 1273984347/deep-review-loop
+/plugin install deep-review-loop@deep-review-loop
+```
+
+**方式 C：skills.sh CLI（Agent 界的 npm）**
+
+```bash
+npm install -g @anthropic-ai/skills
+npx skills add https://github.com/1273984347/deep-review-loop
 ```
 
 ## 使用
