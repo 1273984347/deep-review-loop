@@ -1,4 +1,4 @@
-﻿---
+---
 name: deep-review-loop
 description: >
   Enforces a 5-round deep review loop (R0-R3) with anti-overfit protection for plans, specs, skills,
