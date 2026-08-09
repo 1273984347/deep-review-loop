@@ -1,0 +1,15 @@
+# Backup files
+*.bak
+*.bak.*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor / IDE
+.idea/
+.vscode/
+
+# Local agent memory (if the skill runs inside this repo)
+.memory/
+*.jsonl
