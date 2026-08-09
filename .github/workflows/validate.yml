@@ -24,4 +24,4 @@ jobs:
           python -m pip install -e /tmp/agentskills/skills-ref
 
       - name: Validate SKILL.md
-        run: skills-ref validate .
+        run: skills-ref validate "$(basename "$PWD")"
