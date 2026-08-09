@@ -9,6 +9,9 @@
 > A 5-round deep review loop (R0-R3 + V1-V5) with 4-layer anti-overfit protection. **Review → fix → re-review** until N consecutive rounds find nothing new.
 
 [![license](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
+[![CI](https://github.com/1273984347/deep-review-loop/actions/workflows/validate.yml/badge.svg)](https://github.com/1273984347/deep-review-loop/actions/workflows/validate.yml)
+[![skills-ref](https://img.shields.io/badge/skills--ref-passing-2ea44f)](https://agentskills.io)
+[![version](https://img.shields.io/badge/version-v1.3.0-1d76db)](https://github.com/1273984347/deep-review-loop/releases/latest)
 
 ## What problem it solves
 

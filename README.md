@@ -9,6 +9,9 @@
 > 5 轮深度复检闭环（R0-R3 + V1-V5）+ 4 层过拟合防护。**审查 → 修复 → 重新审查**，直到连续 N 轮无新问题才判定收敛。
 
 [![license](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
+[![CI](https://github.com/1273984347/deep-review-loop/actions/workflows/validate.yml/badge.svg)](https://github.com/1273984347/deep-review-loop/actions/workflows/validate.yml)
+[![skills-ref](https://img.shields.io/badge/skills--ref-passing-2ea44f)](https://agentskills.io)
+[![version](https://img.shields.io/badge/version-v1.3.0-1d76db)](https://github.com/1273984347/deep-review-loop/releases/latest)
 
 ## 解决什么问题
 
