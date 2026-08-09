@@ -1,0 +1,53 @@
+{
+  "skill_name": "deep-review-loop",
+  "queries": [
+    {
+      "query": "我刚批量修了 15 个文件，帮我跑 deep review 复检一下",
+      "should_trigger": true
+    },
+    {
+      "query": "写完了方案文档，帮我复检一遍收敛",
+      "should_trigger": true
+    },
+    {
+      "query": "这个 skill 我刚改过，跑一下 DRL 闭环",
+      "should_trigger": true
+    },
+    {
+      "query": "怀疑上次说 0 问题是假收敛，重新审查一次",
+      "should_trigger": true
+    },
+    {
+      "query": "帮我用 deep-review-loop 检查这份长文档",
+      "should_trigger": true
+    },
+    {
+      "query": "我刚把代码改成 tRPC 了，帮我同步一下文档",
+      "should_trigger": false
+    },
+    {
+      "query": "这个函数报错了，帮我看看为什么",
+      "should_trigger": false
+    },
+    {
+      "query": "帮我写个 hello world",
+      "should_trigger": false
+    },
+    {
+      "query": "把这段 JSON 转成 YAML",
+      "should_trigger": false
+    },
+    {
+      "query": "解释一下什么是 HTTP 缓存",
+      "should_trigger": false
+    },
+    {
+      "query": "重构一下这个模块，测试保持全绿",
+      "should_trigger": false
+    },
+    {
+      "query": "帮我收尾这个 session，整理文档和记忆",
+      "should_trigger": false
+    }
+  ]
+}

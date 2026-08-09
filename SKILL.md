@@ -1,11 +1,14 @@
 ---
 name: deep-review-loop
-description: >
-  Enforces a 5-round deep review loop (R0-R3) with anti-overfit protection for plans, specs, skills,
-  and long documents. Use when writing plans/specs/skills, after batch fixes (>10 items), when the user
-  says "deep review / 复检 / 收敛 / DRL", or when false convergence is suspected.
-  5 轮深度复检闭环（R0-R3）+ 4 层过拟合防护。编写方案/规范/skill/长文档、批量修复（>10 项）后、
-  用户要求「复检/收敛/DRL」、或怀疑假收敛时使用。
+description: >-
+  Enforces a 5-round deep review loop (R0-R3 + V1-V5) with anti-overfit protection for plans, specs,
+  skills, and long documents. Trigger when writing or modifying these artifacts, after batch fixes
+  (>10 items), when the user says "deep review / 复检 / 收敛 / DRL", or when false convergence is
+  suspected — even without explicit keywords. Do not trigger for one-off single-file edits with no
+  structural risk, plain coding/completion without written artifacts, or casual Q&A.
+  5 轮深度复检闭环（R0-R3 + V1-V5）+ 4 层过拟合防护。编写/修改方案、规范、skill、长文档时、批量修复
+  （>10 项）后、用户要求「复检/收敛/DRL」、或怀疑假收敛时触发（即使未点名）。
+  不触发：无结构风险的一次性单文件小改、不涉及书面产物的常规编码/补全、闲聊问答。
 license: Apache-2.0
 compatibility: Agent-agnostic. Requires subagent/task spawning and file search tools (Grep/Read/LS).
 metadata:

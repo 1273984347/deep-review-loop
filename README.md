@@ -43,7 +43,41 @@ npx skills add https://github.com/1273984347/deep-review-loop
 
 ## 使用
 
-编写 plan/spec/skill/长文档后、批量修复（>10 项）后、用户说「复检 / 收敛 / DRL」、或怀疑假收敛时触发。
+**怎么触发**（说这些就会跑起来）：
+
+```
+帮我复检一下这批改动，跑 deep review
+写完方案了，帮我收敛一遍
+这个 skill 我刚改过，跑 DRL
+上次说 0 问题，我怀疑假收敛
+```
+
+**适用 / 不适用**：
+
+| ✅ 适用 | ❌ 不适用 |
+|---|---|
+| plan / spec / skill / 长文档写完或修改后 | 一次性单文件小改（无结构风险） |
+| 批量修复（>10 项）后 | 常规编码 / 补全（不涉及书面产物） |
+| 用户说「复检 / 收敛 / DRL / deep review」 | 闲聊问答 |
+| 怀疑假收敛时（强制重新审查） | 文档 / 记忆收尾（用 [mem-wrap-up](https://github.com/1273984347/mem-wrap-up)） |
+| skill 自身修改后（meta-skill 场景） | 复盘沉淀（用 [self-evolution](https://github.com/1273984347/self-evolution)） |
+
+## 评估与 CI
+
+本仓库自带评估体系（`evals/`），两层 CI 检查保证 skill 不回归：
+
+```text
+evals/
+├── fixtures/                # 4 个行为场景工作区（假收敛/批量修复/meta-skill/文档改动）
+├── evals.json               # 行为级评估：prompt + expected_output + expectations
+├── trigger-eval.json        # 触发评估：应触发 / 不应触发 共 12 条查询
+└── validate.py              # 确定性结构回归检查（frontmatter/触发合同/协议短语/评估一致性）
+```
+
+- **第 1 层**：官方 `skills-ref validate` 校验 frontmatter 合规
+- **第 2 层**：`python evals/validate.py` 断言 description 触发词与反触发条款、R0-R3/收敛曲线/证据铁律等协议短语、4 个 eval 的 fixture 完整性
+
+每次 push 自动跑，任何一项丢失立即标红。
 
 ## MCP 接入（可选）
 
@@ -69,6 +103,7 @@ npx skills add https://github.com/1273984347/deep-review-loop
 | SKILL.md 版本 | 1.3.0 |
 | Agent Skills 标准 | 兼容（[agentskills.io](https://agentskills.io) 开放标准，frontmatter: name/description/license/metadata） |
 | frontmatter 校验 | 通过 `skills-ref validate`（CI 自动检查，见 [.github/workflows/validate.yml](.github/workflows/validate.yml)） |
+| 结构回归检查 | 通过 `python evals/validate.py`（CI 自动检查） |
 | 运行依赖 | 无 Python/Node 脚本；需 subagent/task 派生 + 文件搜索工具（Grep/Read/LS） |
 | MCP 依赖 | 无（可选接入） |
 | 联动 skill | [mem-wrap-up](https://github.com/1273984347/mem-wrap-up)（收尾）/ [self-evolution](https://github.com/1273984347/self-evolution)（沉淀）——不装也能独立运行 |

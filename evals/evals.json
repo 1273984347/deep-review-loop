@@ -1,0 +1,59 @@
+{
+  "skill_name": "deep-review-loop",
+  "evals": [
+    {
+      "id": 1,
+      "name": "false-convergence",
+      "prompt": "我写完了一份《API 迁移计划》并声称全部完成，帮我用 deep-review-loop 过一遍收敛。",
+      "expected_output": "执行 5 轮闭环（R0-R3），发现计划声称完成但步骤缺失的事实，产出收敛曲线与 ≥3 条 residual risk，不输出「0 问题」类 verdict 字眼。",
+      "files": ["evals/fixtures/eval-1-false-convergence"],
+      "expectations": [
+        "抓出 plan.md 声称 5 步完成但步骤 3（回滚方案）缺失的假收敛",
+        "R1a 3 个 verifier 的 finding 都附工具调用证据",
+        "R1b 以 default refuted=true 主动找新问题而非顺着声称",
+        "R3 产出收敛曲线（每轮 P0/P1/P2 单独记录）+ ≥3 residual risk",
+        "输出不包含 verdict 字眼（完成/PASS/OK/没问题/12/12/闭环）"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "batch-fix",
+      "prompt": "刚才批量修了 15 个文件，帮我复检一下这批改动，跑 deep review。",
+      "expected_output": "对批量改动执行完整 5 轮闭环，R1b 做 class-level enumeration 覆盖全部受影响文件，R2 独立审计 + 边际收益 gate，输出收敛曲线。",
+      "files": ["evals/fixtures/eval-2-batch-fix"],
+      "expectations": [
+        "R0 先判定项目阶段并给出 N_max（比赛级 0/生产 3/原型 10）",
+        "R1b class-level enumeration 列出 ALL affected files 而非抽样",
+        "每个 finding 附工具调用证据，0 finding 也附已验证证据",
+        "R2 由独立 subagent 执行（NOT inline），含边际收益 gate 评估",
+        "R3 收敛曲线标注假收敛/真收敛与接受残留字段"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "meta-skill",
+      "prompt": "我刚改了 deep-review-loop 自己的 SKILL.md，帮我按 meta-skill 场景跑一遍闭环。",
+      "expected_output": "修改自身 skill 时强制跑全 5 轮（Scenario 5），R3 ≥3 residual risk，修改前先 Read 留底。",
+      "files": ["evals/fixtures/eval-3-meta-skill"],
+      "expectations": [
+        "识别出这是 meta-skill 修改场景（Scenario 5）而非降级跳过",
+        "修改前已 Read 原文留底（Write 工具要求先 Read）",
+        "R3 写出 ≥3 residual risk（含 subagent 盲点/sample-time-point/跨 session 三类）",
+        "收敛曲线记录每轮 P0/P1/P2，不允许只报最终 0"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "doc-only",
+      "prompt": "我改了一份 README，帮我复检，跑一下 deep review。",
+      "expected_output": "文档改动也执行 R1a（factual accuracy 维度）+ R2（memory sync 维度），避免 cross-doc 不一致被漏过（Scenario 4）。",
+      "files": ["evals/fixtures/eval-4-doc-only"],
+      "expectations": [
+        "识别出文档改动场景（Scenario 4）仍必跑 R1a factual + R2",
+        "R1a 核查文档中的路径/命令与代码实际是否一致（如启动命令、端口）",
+        "R2 审计 memory sync 维度（规则文件/项目记忆/topics 是否需更新）",
+        "R3 ≥3 residual risk，不因「只是改文档」而写 0"
+      ]
+    }
+  ]
+}
