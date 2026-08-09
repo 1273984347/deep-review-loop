@@ -6,7 +6,11 @@
 
 ## What problem it solves
 
-After batch fixes, long documents, or editing a skill itself, LLMs tend to **false-converge** — a single shallow pass concludes "0 issues, done," and the next deep review immediately surfaces problems. This skill hardens the "no false convergence" iron law into a protocol: issue counts must monotonically drop to 0, and N consecutive re-reviews must find nothing new. Four layers of anti-overfit protection stop the review from spiraling ("fix more, find more").
+> "Zero issues, all passed." — Every time an AI says that with total confidence, I remember how it ate its words three minutes later.
+
+You've probably seen it too: after batch-fixing dozens of places, the AI reports "I checked, no problems." You trust it, then a careful re-review surfaces a pile of misses. It's not lying — it really only did a single shallow pass. That's **false convergence**, most common after editing long documents, batch fixes, or editing a skill itself.
+
+This skill hardens the "no false convergence" iron law into a protocol: **review → fix → re-review** until issue counts monotonically drop to 0 and N consecutive re-reviews find nothing new — with 4 layers of anti-overfit protection so reviews don't spiral ("fix more, find more").
 
 ## Core capabilities
 
