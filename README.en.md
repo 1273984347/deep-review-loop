@@ -20,7 +20,15 @@ After batch fixes, long documents, or editing a skill itself, LLMs tend to **fal
 
 A standard Agent Skill (`SKILL.md` + `references/`), installable by any Agent Skills client. Pick one:
 
-**Option A: copy the folder (universal)**
+**Option A: natural-language install (recommended)**
+
+In Claude Code, Codex, or any Agent Skills client, just say:
+
+```text
+Install this skill: https://github.com/1273984347/deep-review-loop
+```
+
+The agent clones it into your skills directory and registers it automatically. If your tool doesn't support that, copy it manually:
 
 ```bash
 git clone https://github.com/1273984347/deep-review-loop.git

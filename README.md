@@ -20,7 +20,15 @@ LLM 在「批量修复、写长文档、改 skill 自身」后极易**假收敛*
 
 标准 Agent Skill（`SKILL.md` + `references/`），任何支持 Agent Skills 的客户端都能装。三种方式任选：
 
-**方式 A：直接复制（通用）**
+**方式 A：自然语言安装（推荐）**
+
+在 Claude Code、Codex 等支持 Agent Skills 的工具里，直接说：
+
+```text
+帮我安装这个 skill：https://github.com/1273984347/deep-review-loop
+```
+
+Agent 会自动 clone 到 skills 目录并注册，不用手动找路径。工具不支持时，手动复制：
 
 ```bash
 git clone https://github.com/1273984347/deep-review-loop.git
