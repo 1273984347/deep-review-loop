@@ -1,24 +1,33 @@
 name: publish-tessl
 
+# 手动触发：在 GitHub Actions 页手动 Run workflow 发布到 Tessl registry。
+# 未配置 TESSL_TOKEN secret 时所有步骤自动跳过（不红）；配置后自动 review + publish。
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
 
 jobs:
   publish:
     runs-on: ubuntu-latest
-    # 仅当配置了 TESSL_TOKEN（Tessl API key）才运行；未配置时静默跳过，不影响主 CI
-    if: secrets.TESSL_TOKEN != ''
-    permissions:
-      id-token: write
-      contents: read
     steps:
       - uses: actions/checkout@v6
       - uses: tesslio/setup-tessl@v2
+        if: ${{ env.TESSL_TOKEN != '' }}
+        env:
+          TESSL_TOKEN: ${{ secrets.TESSL_TOKEN }}
         with:
           token: ${{ secrets.TESSL_TOKEN }}
       - name: Review skill quality
+        if: ${{ env.TESSL_TOKEN != '' }}
+        env:
+          TESSL_TOKEN: ${{ secrets.TESSL_TOKEN }}
         run: tessl skill review ./SKILL.md
       - name: Publish to Tessl registry
+        if: ${{ env.TESSL_TOKEN != '' }}
+        env:
+          TESSL_TOKEN: ${{ secrets.TESSL_TOKEN }}
         run: tessl plugin publish
+      - name: Skip notice
+        if: ${{ env.TESSL_TOKEN == '' }}
+        env:
+          TESSL_TOKEN: ${{ secrets.TESSL_TOKEN }}
+        run: echo "TESSL_TOKEN not configured - set the repository secret to enable Tessl publishing"
