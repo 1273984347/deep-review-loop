@@ -85,7 +85,7 @@ Last time you said 0 issues — I suspect false convergence
 
 ## Evaluation & CI
 
-This repo ships an evaluation suite (`evals/`) with two CI layers to prevent regression:
+This repo ships an evaluation suite (`evals/`) with three CI layers to prevent regression:
 
 ```text
 evals/
@@ -97,8 +97,9 @@ evals/
 
 - **Layer 1**: official `skills-ref validate` — frontmatter compliance
 - **Layer 2**: `python evals/validate.py` — asserts description trigger markers + negative-trigger clause, protocol phrases (R0-R3 / convergence curve / evidence iron law), and fixture integrity of all evals
+- **Layer 3**: `python scripts/version-lint.py` + `python scripts/fragment-lint.py` — four-source version consistency + shared fragments (7-word verdict ban / tool-mapping table) synced across all four repos
 
-Both run on every push; any missing contract turns the check red.
+All run on every push; any missing contract turns the check red.
 
 ## MCP integration (optional)
 
