@@ -18,6 +18,10 @@
 5. **版本联动**：升级 `metadata.version` 时，同步更新 README 版本兼容性表、CHANGELOG、并发布对应 git tag / Release
 6. **共享片段同步**：verdict 禁词列表与工具名映射表是四仓库共享片段（deep-review-loop / mem-wrap-up / self-evolution / agent-session-loop）。修改任一仓库时必须同步其余三仓，并跑 `python scripts/fragment-lint.py` 验证
 
+## AI 协作贡献
+
+本仓库的开发有 AI 协作者（Claude Code, Anthropic）参与：协议设计、跨仓库一致性维护（version-lint / fragment-lint）、文档中英同步与审计。AI 协作提交遵循同一套提交规范与验证要求（conventional commits + 本地验证全过）。
+
 ## 提交规范
 
 - Conventional Commits：`feat:` / `fix:` / `docs:` / `refactor:` / `test:`
