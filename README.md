@@ -24,7 +24,7 @@
 ## 核心能力
 
 - **5 轮协议**：R0 表面检查 → R1a 3 独立 verifier（factual/completeness/reusability）→ R1b 对抗性审查 → R2 独立审计 → R3 收敛判定
-- **4 层过拟合防护**：P2 残留 N（比赛级 0/生产 3/原型 10）、边际收益 gate（修复成本 > 危害×3 接受残留）、过拟合警报（震荡/回归率>30% STOP）、严重度门槛（P3 不报）
+- **4 层过拟合防护**：P2 残留 N（比赛级 0/生产 3/原型 10）、边际收益 gate（修复成本 > 危害×3 接受残留）、过拟合警报（P0 反弹 1 轮 / P1 反弹连续 2 轮 / 持平走 4 轮窗口 / 回归率 >30% → STOP 报告）、严重度门槛（P3 不报，class-level instance 例外升级 P2）
 - **证据铁律**：每个 finding 必须附工具调用证据；0 finding 也要附「已实际验证」证据
 - **防跳轮三件套**：5 类压力场景、6 类借口反驳表、7 条 Red Flags
 - **5 步独立 verify**：file/行数、grep 范式、verdict 禁词、memory sync、3-case dry-run
@@ -97,6 +97,7 @@ evals/
 
 - **第 1 层**：官方 `skills-ref validate` 校验 frontmatter 合规
 - **第 2 层**：`python evals/validate.py` 断言 description 触发词与反触发条款、R0-R3/收敛曲线/证据铁律等协议短语、4 个 eval 的 fixture 完整性
+- **第 3 层**：`python scripts/version-lint.py` + `python scripts/fragment-lint.py`——版本四源一致 + 共享片段（verdict 禁词 7 词全序 / 工具映射表）四仓库同步
 
 每次 push 自动跑，任何一项丢失立即标红。
 

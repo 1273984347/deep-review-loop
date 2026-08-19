@@ -24,7 +24,7 @@ This skill hardens the "no false convergence" iron law into a protocol: **review
 ## Core capabilities
 
 - **5-round protocol**: R0 surface check → R1a 3 independent verifiers (factual / completeness / reusability) → R1b adversarial review → R2 independent audit → R3 convergence verdict
-- **4-layer anti-overfit**: P2 residual N (competition 0 / production 3 / prototype 10), marginal-benefit gate (fix cost > harm ×3 → accept residual), overfit alarm (oscillation / regression rate >30% → STOP), severity threshold (P3 not reported)
+- **4-layer anti-overfit**: P2 residual N (competition 0 / production 3 / prototype 10), marginal-benefit gate (fix cost > harm ×3 → accept residual), overfit alarm (P0 rebound in 1 round / P1 rebound in 2 consecutive rounds / plateau tracked over a 4-round window / regression rate >30% → STOP & report), severity threshold (P3 not reported; class-level instance escalates to P2)
 - **Evidence iron law**: every finding must attach tool-call evidence; "0 findings" also requires proof you actually looked
 - **Anti-skip toolkit**: 5 pressure scenarios, 6 excuse rebuttals, 7 red flags
 - **5-step independent verify**: file/line count, grep patterns, verdict-word ban, memory sync, 3-case dry-run
