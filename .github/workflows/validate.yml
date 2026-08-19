@@ -34,3 +34,6 @@ jobs:
 
       - name: Run version lint
         run: python scripts/version-lint.py
+
+      - name: Run shared-fragment consistency lint
+        run: python scripts/fragment-lint.py

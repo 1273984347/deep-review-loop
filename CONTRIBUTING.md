@@ -16,6 +16,7 @@
 3. **渐进披露**：正文超过 500 行时，把细节拆到 `references/`
 4. **本地验证**：`python evals/validate.py` 必须全 PASS
 5. **版本联动**：升级 `metadata.version` 时，同步更新 README 版本兼容性表、CHANGELOG、并发布对应 git tag / Release
+6. **共享片段同步**：verdict 禁词列表与工具名映射表是四仓库共享片段（deep-review-loop / mem-wrap-up / self-evolution / agent-session-loop）。修改任一仓库时必须同步其余三仓，并跑 `python scripts/fragment-lint.py` 验证
 
 ## 提交规范
 
