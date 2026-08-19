@@ -58,7 +58,7 @@ cp -r deep-review-loop <your-skills-dir>/deep-review-loop
 **方式 C：skills.sh CLI（Agent 界的 npm）**
 
 ```bash
-npm install -g @anthropic-ai/skills
+# npx 首次运行会自动下载 skills CLI，无需全局安装
 npx skills add https://github.com/1273984347/deep-review-loop
 ```
 

@@ -58,7 +58,7 @@ cp -r deep-review-loop <your-skills-dir>/deep-review-loop
 **Option C: skills.sh CLI (the npm of agents)**
 
 ```bash
-npm install -g @anthropic-ai/skills
+# npx downloads the CLI on first run; no global install needed
 npx skills add https://github.com/1273984347/deep-review-loop
 ```
 

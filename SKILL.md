@@ -22,6 +22,31 @@ metadata:
 
 **Announce at start:** "I'm using the deep-review-loop skill to run the 5-round review loop."
 
+## 工具名映射（跨平台）
+
+正文中的工具名按「通用能力」描述，实际执行时映射到你所在平台的等价工具：
+
+| 正文写法 | 通用能力 | 常见平台实现 |
+|:---|:---|:---|
+| subagent / Task | 派独立子代理（可并行） | TRAE Task / Codex spawn_agent / Claude Code Task |
+| RunCommand | 执行 shell 命令 | PowerShell / bash / sh |
+| Grep 工具 | 文本搜索 | TRAE Grep / `rg` / `grep` / Select-String |
+| Read / Edit / Write | 文件读写 | 各平台内建文件工具 / apply_patch |
+| LS / Glob | 枚举文件与目录 | `ls` / `Get-ChildItem` / glob |
+| Skill 工具 | 调用另一个 skill | 各平台 skill 机制；无则按对应 SKILL.md 手动执行 |
+| NEEDS_CONTEXT | 子代理缺上下文的回退信号 | TRAE 内建；其他平台等价于子代理报「信息不足」，按 fallback 处理 |
+
+**PowerShell 示例的 POSIX 等价命令**：
+
+| 目的 | PowerShell | POSIX |
+|:---|:---|:---|
+| 行数统计 | `(Get-Content FILE).Count` | `wc -l FILE` |
+| 文件/路径存在 | `Test-Path FILE` | `test -e FILE` / `test -f FILE` |
+| 递归枚举 | `Get-ChildItem -Recurse -File` | `find . -type f` |
+| 超大文件 | `Get-ChildItem -Recurse \| Where-Object {$_.Length -gt 50KB}` | `find . -type f -size +50k` |
+| 软链目标 | `Get-Item LINK \| Select-Object Target` | `readlink -f LINK` / `ls -l LINK` |
+| 命中计数 | Grep output_mode=count | `grep -c PATTERN FILE` / `rg -c PATTERN FILE` |
+
 ## 在 skill 闭环中的位置
 
 本 skill 是「审查 → 收尾 → 沉淀」三 skill 闭环的**审查端（起点）**，与 [mem-wrap-up](https://github.com/1273984347/mem-wrap-up)（收尾）和 [self-evolution](https://github.com/1273984347/self-evolution)（沉淀）联动：
