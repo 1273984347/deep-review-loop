@@ -11,6 +11,13 @@
 ### Added
 - scripts/fragment-lint.py 共享片段一致性 lint + CI 接入（守护 verdict 禁词 / 工具映射表四仓库同步）
 
+## [1.3.1] - 2026-08-31
+
+### Changed
+- 跨平台清理：NEEDS_CONTEXT 信号通用化（去掉 TRAE 平台绑定），compatibility 字段改为 subagent optional
+- 新增「无子代理平台的降级模式」：并行 subagent → 串行/主代理分轮内审，独立审查 → 自我对抗（显式标注 `degraded (no-subagent)`），降级 ≠ 跳过
+- 四源版本同步（SKILL.md / README / CHANGELOG / marketplace.json）
+
 ## [1.3.0] - 2026-08-10
 
 ### Added

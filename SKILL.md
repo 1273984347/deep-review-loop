@@ -10,9 +10,9 @@ description: >-
   （>10 项）后、用户要求「复检/收敛/DRL」、或怀疑假收敛时触发（即使未点名）。
   不触发：无结构风险的一次性单文件小改、不涉及书面产物的常规编码/补全、闲聊问答。
 license: Apache-2.0
-compatibility: Agent-agnostic. Requires subagent/task spawning and file search tools (Grep/Read/LS).
+compatibility: Agent-agnostic. Requires file search tools (Grep/Read/LS); subagent/task spawning optional (degradation mode when absent).
 metadata:
-  version: "1.3.0"
+  version: "1.3.1"
 ---
 
 # Deep Review Loop
@@ -34,7 +34,7 @@ metadata:
 | Read / Edit / Write | 文件读写 | 各平台内建文件工具 / apply_patch |
 | LS / Glob | 枚举文件与目录 | `ls` / `Get-ChildItem` / glob |
 | Skill 工具 | 调用另一个 skill | 各平台 skill 机制；无则按对应 SKILL.md 手动执行 |
-| NEEDS_CONTEXT | 子代理缺上下文的回退信号 | TRAE 内建；其他平台等价于子代理报「信息不足」，按 fallback 处理 |
+| NEEDS_CONTEXT | 子代理缺上下文的回退信号 | 通用约定：子代理报告「信息不足/上下文缺失」时按 fallback 处理；个别平台内建等价信号（如 TRAE NEEDS_CONTEXT）直接映射 |
 
 **PowerShell 示例的 POSIX 等价命令**：
 
@@ -46,6 +46,18 @@ metadata:
 | 超大文件 | `Get-ChildItem -Recurse \| Where-Object {$_.Length -gt 50KB}` | `find . -type f -size +50k` |
 | 软链目标 | `Get-Item LINK \| Select-Object Target` | `readlink -f LINK` / `ls -l LINK` |
 | 命中计数 | Grep output_mode=count | `grep -c PATTERN FILE` / `rg -c PATTERN FILE` |
+
+## 无子代理平台的降级模式
+
+平台不支持子代理/任务派生时，**降级 ≠ 跳过**，核心轮次必须全部执行，只改变执行者：
+
+| 原执行方式 | 降级方式 | 铁律 |
+|:---|:---|:---|
+| R1a：3 个 parallel verifier | 串行逐个派发；无派发能力则由主代理分 3 轮独立视角内审 | 3-lens（factual / completeness / reusability）必须拆成 3 轮独立检查，禁止一轮合并 |
+| R1b / R2：独立 subagent 审查 | 主代理自我对抗：换视角重读 + 默认 refute 自己结论 + 附工具证据 | self-audit ≠ 独立审计，降级必须显式标注 `degraded (no-subagent)`，收敛判定从严 |
+| 子代理缺上下文回退（NEEDS_CONTEXT） | 主代理自查 scope 是否过宽，缩小到具体 file:line 后重跑 | 不允许静默跳过该轮 |
+
+降级后收尾报告/复盘记录必须显式标注 `degraded (no-subagent mode)`，不编造子代理证据。
 
 ## 在 skill 闭环中的位置
 
