@@ -4,6 +4,19 @@
 
 ## [Unreleased]
 
+## [1.3.2] - 2026-08-31
+
+### Fixed
+- 出口 ACK 门禁：收敛判定含「接受残留」或 P1+ 残留 → 等人类 `ACK + 风险接受` 才能闭环（漏洞 6）
+- 双层严重度制：结构性硬指标由脚本判定，AI 语义判定必须附可复现证据链（漏洞 3）
+- 路径预检 + Grep 空结果判别：占位符使用前强制 `test -e`，预检失败中断问用户（漏洞 7/9/15）
+
+### Added
+- LLM 行为 eval（evals/run_behavior_llm.py，双模式 --api/--manual，发布前手动门禁，不进 CI）
+- fragment-lint 交叉引用校验（三 skill 互链必须在 README 出现）
+- version-lint 内容漂移软告警（内容变版本未变 → WARN）
+- README badge 改动态 release badge；CI 加 macos-latest runner + skills-ref pin 到 commit SHA
+
 ## [1.3.1] - 2026-08-31
 
 ### Fixed

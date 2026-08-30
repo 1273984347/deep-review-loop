@@ -12,7 +12,7 @@ description: >-
 license: Apache-2.0
 compatibility: Agent-agnostic. Requires file search tools (Grep/Read/LS); subagent/task spawning optional (degradation mode when absent).
 metadata:
-  version: "1.3.1"
+  version: "1.3.2"
 ---
 
 # Deep Review Loop
@@ -237,6 +237,11 @@ Output: refuted=true/false + findings list (含严重度分级) + class-level en
 - R1b 严重度降级必须附依据（不允许仅声明「P2」无理由）
 - 违反处置：R2 审计时发现 R1b 违反硬性要求 → 该 finding 视为「未验证」，不计入收敛判定，要求重新派 R1b
 
+**双层严重度制（防 AI 自评操纵，对应反模式 4）**：
+- **结构性硬指标 → 脚本判定**（`evals/validate.py` / `scripts/version-lint.py` 等，CI 自动跑）：verdict 禁词命中、文件超限、residual 数量不足、版本四源不一致——这些不依赖语义判断，一律由脚本定 P1/P2，AI 无权改判。
+- **语义严重度 → AI 判定但附证据链**：架构/逻辑类缺陷的 P0-P3 由 AI 定级，但 P0/P1 判定和任何降级必须附**可复现证据链**（Grep/Read trace 到 file:line + 命令输出）；无证据链的降级视为「未验证」。
+- **处置**：脚本可判定的项，AI 声称「P2 可接受」但脚本检测为结构性违规 → 以脚本为准，标 P1 必须修复。
+
 ### R2 independent audit（1 Task subagent，**NOT inline**，强制 + 边际收益 gate）
 
 > ⚠️ **R2 强制**：必须派独立 Task subagent，**不允许 inline self-audit**。Self-audit ≠ 独立审计。
@@ -338,6 +343,8 @@ Output: priority decision + audit findings + memory sync status + verdict grep s
 | **优先级** | 警报 A/B > 边际收益 gate > P2 超标。同时触发时按此顺序判定 |
 | **警报 A 与边际收益 gate 关系** | 边际收益 gate 采纳的残留导致的 P1/P2 持平不触发警报 A（例外条款）；未采纳的修复无效导致的持平仍触发警报 A |
 
+**出口 ACK 门禁**：DRL 收敛判定含「接受残留」或 P1 及以上残留 → 等待人类 `ACK + 风险接受` 才能视为闭环完成；仅 P2 残留 → 自动放行，但收尾报告标注「待确认项」。该门禁在作为子流程被 mem-wrap-up 调用时同样生效（Step 7 反向审查）。
+
 ---
 
 ## 6. 5 步独立 verify（V1 → V5）
@@ -374,6 +381,7 @@ Output: priority decision + audit findings + memory sync status + verdict grep s
 | 4 | 复利经验 | 项目内 retrospective 文档（如存在） | Grep 工具搜编号 |
 
 > **路径约定**：`<memory_root>` = agent 的 memory 根目录（按平台映射：TRAE `~/.trae-cn/memory`；Claude Code `%USERPROFILE%\.claude\projects`（Windows）/ `~/Library/Application Support/Claude/projects`（macOS）；WorkBuddy `~/.workbuddy/memory/` 或项目内 `.workbuddy/memory/`；无现成 memory 系统时在项目内建 `.agent-memory/`）；`<project-slug>` = 当前 workspace 对应的 memory 项目目录名。执行时按当前环境映射。若所用环境无 memory 系统，本步标 `not-applicable`，不编造证据。
+> **路径预检（首次运行强制）**：用占位符前先验证路径存在（`test -e` / `Test-Path`）；预检失败 → 中断问用户，不允许猜路径继续。**Grep 空结果判别**：Grep 0 hits 时先用 `test -e` 区分「路径错误」与「真无匹配」，无法区分时标 `unverifiable` 询问用户，不得把空结果当通过。
 
 ### V5: 3-case dry-run（best / worst / null）
 

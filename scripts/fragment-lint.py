@@ -30,6 +30,29 @@ ANCHOR_ROWS = [
     "| Read / Edit / Write |",
 ]
 
+# Cross-repo links that must appear in README (three-skill loop self-references).
+SIBLING_REPOS = [
+    "1273984347/deep-review-loop",
+    "1273984347/mem-wrap-up",
+    "1273984347/self-evolution",
+    "1273984347/agent-session-loop",
+]
+
+
+def check_readme_links() -> int:
+    """Every sibling repo URL must appear in README.md (and README.en.md if present)."""
+    errors = 0
+    for fname in ("README.md", "README.en.md"):
+        readme = ROOT / fname
+        if not readme.exists():
+            continue
+        text = readme.read_text(encoding="utf-8")
+        for repo in SIBLING_REPOS:
+            if repo not in text:
+                print(f"FAIL: {fname} missing cross-repo link ({repo})")
+                errors += 1
+    return errors
+
 
 def check_skill() -> int:
     skill = ROOT / "SKILL.md"
@@ -72,7 +95,7 @@ def check_references() -> int:
 
 
 def main() -> int:
-    errors = check_skill() + check_references()
+    errors = check_skill() + check_references() + check_readme_links()
     if errors:
         print(f"FAIL: fragment lint found {errors} issue(s)")
         return 1

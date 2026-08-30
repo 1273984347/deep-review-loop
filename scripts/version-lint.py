@@ -55,11 +55,37 @@ def check_marketplace(v: str) -> None:
         sys.exit(f"FAIL: marketplace.json metadata.version ({meta.get('version')}) != SKILL.md ({v})")
 
 
+def warn_content_drift(v: str) -> None:
+    """Soft WARN (not FAIL): SKILL.md content changed vs HEAD but version did not.
+
+    Uses git if available; skips silently when HEAD is absent (fresh checkout)
+    or git is unavailable — never fails the CI on this check.
+    """
+    try:
+        import subprocess
+
+        head = subprocess.run(
+            ["git", "show", "HEAD:SKILL.md"],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+        )
+        if head.returncode != 0:
+            return  # no HEAD / not a repo / file untracked — skip
+        current = (ROOT / "SKILL.md").read_text(encoding="utf-8")
+        if current != head.stdout:
+            print(f"WARN: SKILL.md content differs from HEAD but version is still {v} — consider bumping patch if this is a behavior change")
+    except Exception:
+        pass  # soft check only; never fail on tooling absence
+
+
 def main() -> None:
     v = read_version()
     check_readme(v)
     check_changelog(v)
     check_marketplace(v)
+    warn_content_drift(v)
     print(f"PASS: version lint OK ({v}) across SKILL.md/README/CHANGELOG/marketplace.json")
 
 
