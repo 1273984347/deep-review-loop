@@ -124,9 +124,8 @@ This skill and MCP are **complementary, not dependent**: MCP provides external t
 |---|---|
 | SKILL.md version | 1.3.1 |
 | Agent Skills standard | Compatible ([agentskills.io](https://agentskills.io); frontmatter: name/description/license/metadata) |
-| Frontmatter validation | `skills-ref validate` (CI, see [.github/workflows/validate.yml](.github/workflows/validate.yml)) |
-| Structural regression | `python evals/validate.py` (CI) |
-| Runtime deps | No Python/Node scripts; needs subagent spawning + file search (Grep/Read/LS) |
+| CI gate | Five steps: `skills-ref validate` + `python evals/validate.py` + `python evals/run_behavior.py` + `python scripts/version-lint.py` + `python scripts/fragment-lint.py` (see [.github/workflows/validate.yml](.github/workflows/validate.yml)) |
+| Runtime deps | Skill runtime: file search (Grep/Read/LS); subagent optional (degradation mode when absent); CI lint scripts are dev-time only |
 | MCP deps | None (optional) |
 | Linked skills | [mem-wrap-up](https://github.com/1273984347/mem-wrap-up) / [self-evolution](https://github.com/1273984347/self-evolution) — works standalone |
 
@@ -141,8 +140,10 @@ This skill and MCP are **complementary, not dependent**: MCP provides external t
 
 ## Environment
 
-- Needs subagent/task spawning + file search tools (Grep/Read/LS).
-- Memory paths use `<memory_root>` placeholders (mark `not-applicable` if no memory system — never fabricate evidence).
+- **Path placeholders (read before first use)**: the skill uses `<memory_root>` placeholders — replace before running:
+  - `<memory_root>` = your agent's memory root. Common setups: TRAE → `.trae-cn/memory`; Claude Code → projects dir; WorkBuddy → `~/.workbuddy/memory/` or in-repo `.workbuddy/memory/`; if no memory system exists, create an in-repo `.agent-memory/`.
+  - **Not sure?** Run `ls` (POSIX) / `Get-ChildItem` (PowerShell) to inspect your agent environment's existing dirs, then map against the examples above; **never guess paths**. If the environment truly has no memory system, mark the step `not-applicable` — never fabricate evidence.
+- **Tools**: file search (Grep/Read/LS); subagent/task spawning is **optional** — without it, the skill falls back to the degradation mode (see SKILL.md「无子代理平台的降级模式」: R1a serial instead of parallel, R1b/R2 self-adversarial review, explicitly marked `degraded (no-subagent)`).
 
 ## Related repos
 
