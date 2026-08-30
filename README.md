@@ -134,9 +134,10 @@ evals/
 
 | 客户端 | 安装方式 | 支持 |
 |---|---|---|
-| TRAE | 复制目录到 skills 目录，自动注册 | ✅ |
 | Claude Code | `/plugin marketplace add` 或复制目录 | ✅ |
 | Codex / Cursor / OpenCode 等 | 复制目录（Agent Skills 标准客户端） | ✅ |
+| WorkBuddy / QwenWork | 复制目录到 skills 目录，自动注册 | ✅ |
+| TRAE | 复制目录到 skills 目录，自动注册 | ✅ |
 | 其他 | 需支持 SKILL.md frontmatter + 渐进披露 | 视实现 |
 
 ## 环境适配
