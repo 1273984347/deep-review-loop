@@ -4,14 +4,14 @@
 
 ## [Unreleased]
 
+## [1.3.1] - 2026-08-31
+
 ### Fixed
 - verdict 禁词统一 7 词全序（补 `looks good`，对齐三 skill 闭环其余仓库）
 - R0 file size sanity 补目标值（≤500 行 / 5000 tokens，对齐 references 详案）
 
 ### Added
 - scripts/fragment-lint.py 共享片段一致性 lint + CI 接入（守护 verdict 禁词 / 工具映射表四仓库同步）
-
-## [1.3.1] - 2026-08-31
 
 ### Changed
 - 跨平台清理：NEEDS_CONTEXT 信号通用化（去掉 TRAE 平台绑定），compatibility 字段改为 subagent optional
