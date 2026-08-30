@@ -29,14 +29,14 @@ metadata:
 | 正文写法 | 通用能力 | 常见平台实现 |
 |:---|:---|:---|
 | subagent / Task | 派独立子代理（可并行） | TRAE Task / Codex spawn_agent / Claude Code Task |
-| RunCommand | 执行 shell 命令 | PowerShell / bash / sh |
+| RunCommand | 执行 shell 命令 | PowerShell（Windows）/ bash / zsh（macOS）/ sh |
 | Grep 工具 | 文本搜索 | TRAE Grep / `rg` / `grep` / Select-String |
 | Read / Edit / Write | 文件读写 | 各平台内建文件工具 / apply_patch |
 | LS / Glob | 枚举文件与目录 | `ls` / `Get-ChildItem` / glob |
 | Skill 工具 | 调用另一个 skill | 各平台 skill 机制；无则按对应 SKILL.md 手动执行 |
 | NEEDS_CONTEXT | 子代理缺上下文的回退信号 | 通用约定：子代理报告「信息不足/上下文缺失」时按 fallback 处理；个别平台内建等价信号（如 TRAE NEEDS_CONTEXT）直接映射 |
 
-**PowerShell 示例的 POSIX 等价命令**：
+**命令示例（Windows PowerShell ↔ macOS/Linux POSIX）**：
 
 | 目的 | PowerShell | POSIX |
 |:---|:---|:---|
@@ -165,7 +165,7 @@ metadata:
 
 **3 件套**（用 Grep 工具 + Read 工具，非 bash）：
 
-1. **file size sanity**：Read 工具打开目标文件，观察行数（目标 ≤500 行 / 5000 tokens）；或 RunCommand `(Get-Content FILE).Count`（PowerShell）。
+1. **file size sanity**：Read 工具打开目标文件，观察行数（目标 ≤500 行 / 5000 tokens）；或 RunCommand `(Get-Content FILE).Count`（PowerShell）/ `wc -l FILE`（macOS/Linux）。
 2. **residual verdict words**：Grep 工具，pattern `完成|PASS|12/12|闭环|OK|没问题|looks good`，output_mode=count，逐词或合并 regex。
 3. **expected hits 必现**：Grep 工具，pattern `R0|R1a|R1b|R2|R3|residual` 等，确认结构词命中。
 4. **项目阶段判定（过拟合防护层 1 前置）**：判定当前项目阶段 → N_max 取值。规则：
@@ -373,7 +373,7 @@ Output: priority decision + audit findings + memory sync status + verdict grep s
 | 3 | 近期 topic | `<memory_root>/projects/<project-slug>/<date>/topics.md` | Read 工具看最新 |
 | 4 | 复利经验 | 项目内 retrospective 文档（如存在） | Grep 工具搜编号 |
 
-> **路径约定**：`<memory_root>` = agent 的 memory 根目录（如 TRAE `.trae-cn/memory`、Claude Code projects 目录，或项目内 `.agent-memory`）；`<project-slug>` = 当前 workspace 对应的 memory 项目目录名。执行时按当前环境映射。若所用环境无 memory 系统，本步标 `not-applicable`，不编造证据。
+> **路径约定**：`<memory_root>` = agent 的 memory 根目录（按平台映射：TRAE `~/.trae-cn/memory`；Claude Code `%USERPROFILE%\.claude\projects`（Windows）/ `~/Library/Application Support/Claude/projects`（macOS）；WorkBuddy `~/.workbuddy/memory/` 或项目内 `.workbuddy/memory/`；无现成 memory 系统时在项目内建 `.agent-memory/`）；`<project-slug>` = 当前 workspace 对应的 memory 项目目录名。执行时按当前环境映射。若所用环境无 memory 系统，本步标 `not-applicable`，不编造证据。
 
 ### V5: 3-case dry-run（best / worst / null）
 

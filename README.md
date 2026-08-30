@@ -141,8 +141,8 @@ evals/
 ## 环境适配
 
 - **路径占位符（首次使用必读）**：正文使用 `<memory_root>` 占位符，执行前先替换：
-  - `<memory_root>` = agent 的 memory 根目录。常见环境：TRAE → `.trae-cn/memory`；Claude Code → projects 目录；WorkBuddy → `~/.workbuddy/memory/` 或项目内 `.workbuddy/memory/`；无现成 memory 系统时，在项目内建 `.agent-memory/` 即可。
-  - **不确定怎么填？** 先 `ls`（POSIX）/ `Get-ChildItem`（PowerShell）查看你的 agent 环境已有目录，对照上述示例再替换；**不要凭空猜路径**。若环境确无 memory 系统，相关步骤标 `not-applicable`，不编造证据。
+  - `<memory_root>` = agent 的 memory 根目录。常见环境：TRAE → `~/.trae-cn/memory`；Claude Code → `%USERPROFILE%\.claude\projects`（Windows）/ `~/Library/Application Support/Claude/projects`（macOS）；WorkBuddy → `~/.workbuddy/memory/` 或项目内 `.workbuddy/memory/`；无现成 memory 系统时，在项目内建 `.agent-memory/` 即可。
+  - **不确定怎么填？** 先 `ls`（macOS/Linux）/ `Get-ChildItem`（Windows）查看你的 agent 环境已有目录，对照上述示例再替换；**不要凭空猜路径**。若环境确无 memory 系统，相关步骤标 `not-applicable`，不编造证据。
 - **工具**：文件搜索（Grep/Read/LS）；subagent/task 派生为**可选能力**——无则自动走降级模式（见 SKILL.md「无子代理平台的降级模式」：R1a 串行替代并行、R1b/R2 自我对抗，显式标注 `degraded (no-subagent)`）。
 
 ## 相关仓库

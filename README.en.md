@@ -141,8 +141,8 @@ This skill and MCP are **complementary, not dependent**: MCP provides external t
 ## Environment
 
 - **Path placeholders (read before first use)**: the skill uses `<memory_root>` placeholders — replace before running:
-  - `<memory_root>` = your agent's memory root. Common setups: TRAE → `.trae-cn/memory`; Claude Code → projects dir; WorkBuddy → `~/.workbuddy/memory/` or in-repo `.workbuddy/memory/`; if no memory system exists, create an in-repo `.agent-memory/`.
-  - **Not sure?** Run `ls` (POSIX) / `Get-ChildItem` (PowerShell) to inspect your agent environment's existing dirs, then map against the examples above; **never guess paths**. If the environment truly has no memory system, mark the step `not-applicable` — never fabricate evidence.
+  - `<memory_root>` = your agent's memory root. Common setups: TRAE → `~/.trae-cn/memory`; Claude Code → `%USERPROFILE%\.claude\projects` (Windows) / `~/Library/Application Support/Claude/projects` (macOS); WorkBuddy → `~/.workbuddy/memory/` or in-repo `.workbuddy/memory/`; if no memory system exists, create an in-repo `.agent-memory/`.
+  - **Not sure?** Run `ls` (macOS/Linux) / `Get-ChildItem` (Windows) to inspect your agent environment's existing dirs, then map against the examples above; **never guess paths**. If the environment truly has no memory system, mark the step `not-applicable` — never fabricate evidence.
 - **Tools**: file search (Grep/Read/LS); subagent/task spawning is **optional** — without it, the skill falls back to the degradation mode (see SKILL.md「无子代理平台的降级模式」: R1a serial instead of parallel, R1b/R2 self-adversarial review, explicitly marked `degraded (no-subagent)`).
 
 ## Related repos
