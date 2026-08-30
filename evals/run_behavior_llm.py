@@ -117,7 +117,10 @@ def structural_checks(text: str, eval_: dict) -> list[tuple[str, bool]]:
     """Loose structural assertions. Semantic quality is a human-review item."""
     checks: list[tuple[str, bool]] = []
     checks.append(("含收敛曲线（Round/P0/P1）", bool(re.search(r"(Round|P0|P1)", text))))
-    checks.append(("residual risk ≥3 条", len(re.findall(r"residual", text, re.I)) >= 3))
+    # Residual: presence of a residual header AND >=3 numbered items anywhere.
+    has_residual = bool(re.search(r"[Rr]esidual", text))
+    n_items = len(re.findall(r"^\s*\d+\.\s", text, re.M))
+    checks.append(("residual risk ≥3 条（编号条目）", has_residual and n_items >= 3))
     checks.append(("附工具证据（Grep/Read/file:）", bool(re.search(r"(Grep|Read|file:)", text))))
     checks.append(("无 verdict 禁词", not any(w in text for w in VERDICT_BAN)))
     return checks
