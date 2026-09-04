@@ -18,8 +18,13 @@ jobs:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
       - uses: tesslio/setup-tessl@25ec223fc0da33b41b8044ff5ab2b85235f4f91e # v2
         if: ${{ env.TESSL_TOKEN != '' }}
+        # token 必须经由 action 的 token 输入接线（由 action 导出认证状态）；
+        # 只靠 job 级 env 的 TESSL_TOKEN，CLI 会报 "requires you to be logged in"
+        with:
+          token: ${{ secrets.TESSL_TOKEN }}
       - name: Review skill quality
         if: ${{ env.TESSL_TOKEN != '' }}
+        # 已废弃（官方建议迁移 tessl review run，需绑定 workspace），2026-07 后可能移除
         run: tessl skill review ./SKILL.md
       - name: Publish to Tessl registry
         if: ${{ env.TESSL_TOKEN != '' }}
