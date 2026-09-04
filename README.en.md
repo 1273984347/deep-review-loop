@@ -122,12 +122,14 @@ This skill and MCP are **complementary, not dependent**: MCP provides external t
 
 | Check | Value |
 |---|---|
-| SKILL.md version | 1.3.2 |
+| SKILL.md version | 1.3.3 |
 | Agent Skills standard | Compatible ([agentskills.io](https://agentskills.io); frontmatter: name/description/license/metadata) |
 | CI gate | Five steps: `skills-ref validate` + `python evals/validate.py` + `python evals/run_behavior.py` + `python scripts/version-lint.py` + `python scripts/fragment-lint.py` (see [.github/workflows/validate.yml](.github/workflows/validate.yml)) |
-| Runtime deps | Skill runtime: file search (Grep/Read/LS); subagent optional (degradation mode when absent); CI lint scripts are dev-time only |
+| Runtime deps | Skill runtime: filesystem + shell (PowerShell/POSIX) + file search (Grep/Read/LS); subagent optional (degradation mode when absent); shell-less web agents not supported; CI lint scripts are dev-time only |
 | MCP deps | None (optional) |
 | Linked skills | [mem-wrap-up](https://github.com/1273984347/mem-wrap-up) / [self-evolution](https://github.com/1273984347/self-evolution) — works standalone |
+
+**Cost expectations**: up to 5 subagents per round (R1a×3 + R1b + R2); multi-round loops scale linearly with round count. Platforms without subagents use the degradation mode (main-agent internal review, cheaper but explicitly marked `degraded`). In token-sensitive environments run R0 + R3 surface checks first, then decide whether to enter the full 5-round loop.
 
 **Client compatibility**:
 

@@ -4,6 +4,20 @@
 
 ## [Unreleased]
 
+## [1.3.3] - 2026-09-04
+
+### Fixed
+- publish-tessl.yml：TESSL_TOKEN 提升到 job 级 env——step 自身的 env 在它自己的 `if` 求值时尚未应用，原 step 级写法条件恒为 false，配置了 secret 也永远跳过（发布流水线死代码修复）
+- GitHub Actions 全部 pin 到 commit SHA（actions/checkout v4/v6、setup-python v5、tesslio/setup-tessl v2），消除可变 tag 的供应链风险
+- verdict 禁词自匹配误报：R0 / V3 grep 命中先剔除禁词定义行本身再计数（meta-skill 场景目标文件内嵌禁词清单自匹配 +「OK」子串误报 TOKEN/BROKEN 等），fragment-lint 新增锚点防漂移
+- 防 ping-pong 护栏：作为 mem-wrap-up Step 7b 子流程时收敛后直接返回调用方、不再回触 mem-wrap-up；mem-wrap-up 联动每 session 至多一轮
+
+### Changed
+- compatibility 字段如实声明：需要文件系统 + shell（PowerShell/POSIX）+ 文件搜索；无 shell 的纯 Web agent 不支持（原文 "Agent-agnostic" 超前）
+- CI 加 windows-latest runner（skills-ref 两步在 Windows 跳过：上游 CLI 静默 exit 1）；lint/eval 步骤三平台覆盖
+- .gitignore 补 `__pycache__/` 与 `.mimosa/`
+- README（中/英）补 token 成本预期；运行依赖行同步 compatibility 修订
+
 ## [1.3.2] - 2026-08-31
 
 ### Fixed

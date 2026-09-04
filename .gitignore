@@ -13,3 +13,9 @@ Thumbs.db
 # Local agent memory (if the skill runs inside this repo)
 .memory/
 *.jsonl
+
+# Python bytecode caches (local lint/eval runs)
+__pycache__/
+
+# Local tool state (security-scan hook state etc.)
+.mimosa/

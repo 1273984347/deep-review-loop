@@ -10,9 +10,9 @@ description: >-
   （>10 项）后、用户要求「复检/收敛/DRL」、或怀疑假收敛时触发（即使未点名）。
   不触发：无结构风险的一次性单文件小改、不涉及书面产物的常规编码/补全、闲聊问答。
 license: Apache-2.0
-compatibility: Agent-agnostic. Requires file search tools (Grep/Read/LS); subagent/task spawning optional (degradation mode when absent).
+compatibility: Requires filesystem + shell (PowerShell/POSIX) + file search (Grep/Read/LS); subagent/task spawning optional (degradation mode when absent). Shell-less web agents not supported.
 metadata:
-  version: "1.3.2"
+  version: "1.3.3"
 ---
 
 # Deep Review Loop
@@ -70,6 +70,8 @@ metadata:
 - **反向触发**（上游 → 本 skill）：
   - **self-evolution** 复盘发现流程撞坑 → 升级 DRL 协议
   - **mem-wrap-up** 收尾验证时调用 DRL 作为子流程
+
+> **防 ping-pong 护栏**：本 skill 收敛后触发的 mem-wrap-up 联动每 session 至多执行一轮；若本 skill 是作为 mem-wrap-up Step 7b 的子流程被调用，收敛后直接返回调用方，不再回触 mem-wrap-up。
 
 ## 0. 真循环铁律（最高优先级，违反即重大失误）
 
@@ -166,7 +168,7 @@ metadata:
 **3 件套**（用 Grep 工具 + Read 工具，非 bash）：
 
 1. **file size sanity**：Read 工具打开目标文件，观察行数（目标 ≤500 行 / 5000 tokens）；或 RunCommand `(Get-Content FILE).Count`（PowerShell）/ `wc -l FILE`（macOS/Linux）。
-2. **residual verdict words**：Grep 工具，pattern `完成|PASS|12/12|闭环|OK|没问题|looks good`，output_mode=count，逐词或合并 regex。
+2. **residual verdict words**：Grep 工具，pattern `完成|PASS|12/12|闭环|OK|没问题|looks good`，output_mode=count，逐词或合并 regex。命中后先剔除禁词定义行本身再计数（meta-skill 自匹配，详见 V3）。
 3. **expected hits 必现**：Grep 工具，pattern `R0|R1a|R1b|R2|R3|residual` 等，确认结构词命中。
 4. **项目阶段判定（过拟合防护层 1 前置）**：判定当前项目阶段 → N_max 取值。规则：
    - 比赛级（黑客松 / demo 提交）→ N_max=0
@@ -370,6 +372,8 @@ Output: priority decision + audit findings + memory sync status + verdict grep s
 ### V3: verdict 字眼 grep
 
 用 Grep 工具，pattern `完成|PASS|12/12|闭环|OK|没问题|looks good`，output_mode=count。历史 log 文件例外。
+
+**剔除禁词定义行**（防自匹配误报）：meta-skill 场景下目标文件内嵌的禁词清单字符串会自匹配，剔除含 pattern 的定义行后重新计数；「OK」子串误报（TOKEN / BROKEN 等全大写词）同理剔除或人工复核。
 
 ### V4: memory sync 4 维度
 

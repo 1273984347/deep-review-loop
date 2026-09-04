@@ -122,12 +122,14 @@ evals/
 
 | 检查项 | 值 |
 |---|---|
-| SKILL.md 版本 | 1.3.2 |
+| SKILL.md 版本 | 1.3.3 |
 | Agent Skills 标准 | 兼容（[agentskills.io](https://agentskills.io) 开放标准，frontmatter: name/description/license/metadata） |
 | CI 门禁 | 五步：`skills-ref validate` + `python evals/validate.py` + `python evals/run_behavior.py` + `python scripts/version-lint.py` + `python scripts/fragment-lint.py`（见 [.github/workflows/validate.yml](.github/workflows/validate.yml)） |
-| 运行依赖 | skill 运行：文件搜索（Grep/Read/LS）；subagent 可选（无则降级）；CI lint 脚本仅开发期需要 |
+| 运行依赖 | skill 运行：文件系统 + shell（PowerShell/POSIX）+ 文件搜索（Grep/Read/LS）；subagent 可选（无则降级）；无 shell 的纯 Web agent 不支持；CI lint 脚本仅开发期需要 |
 | MCP 依赖 | 无（可选接入） |
 | 联动 skill | [mem-wrap-up](https://github.com/1273984347/mem-wrap-up)（收尾）/ [self-evolution](https://github.com/1273984347/self-evolution)（沉淀）——不装也能独立运行 |
+
+**成本预期**：单轮最多派 5 个 subagent（R1a×3 + R1b + R2），多轮循环按轮数线性增长；无子代理平台走降级模式（主代理分轮内审，成本更低但显式标注 `degraded`）。token 敏感环境先跑 R0 + R3 表面检查，再决定是否进入全量 5 轮。
 
 **客户端兼容矩阵**：
 

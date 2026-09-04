@@ -3,10 +3,11 @@
 
 Guards the cross-file protocol snippets that must stay identical across the
 three-skill loop repos (deep-review-loop / mem-wrap-up / self-evolution /
-agent-session-loop): the 7-word verdict-ban list and the tool-name mapping
-table. The canonical fragments are hardcoded below — every repo runs this same
-script (md5-identical), so a pass here means the fragment agrees with the
-canonical wording and the 6-word legacy order never reappears.
+agent-session-loop): the 7-word verdict-ban list, the tool-name mapping
+table, and the ban self-match carve-out. The canonical fragments are
+hardcoded below — every repo runs this same script (md5-identical), so a
+pass here means the fragment agrees with the canonical wording and the
+6-word legacy order never reappears.
 
 Pure stdlib, read-only, CI-safe. Mirror of scripts/version-lint.py.
 """
@@ -29,6 +30,11 @@ ANCHOR_ROWS = [
     "| Grep 工具 |",
     "| Read / Edit / Write |",
 ]
+
+# Ban self-match carve-out: SKILL.md must instruct the reviewer to exclude the
+# ban-list definition line itself before counting hits (meta-skill targets
+# embed the ban string, so raw grep always false-positives).
+CARVEOUT_ANCHOR = "剔除禁词定义行"
 
 # Cross-repo links that must appear in README (three-skill loop self-references).
 SIBLING_REPOS = [
@@ -72,6 +78,9 @@ def check_skill() -> int:
         if row not in text:
             print(f"FAIL: SKILL.md missing tool-mapping anchor row ({row})")
             errors += 1
+    if CARVEOUT_ANCHOR not in text:
+        print(f"FAIL: SKILL.md missing ban self-match carve-out ({CARVEOUT_ANCHOR})")
+        errors += 1
     return errors
 
 
