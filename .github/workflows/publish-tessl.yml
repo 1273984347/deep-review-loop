@@ -12,7 +12,10 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     env:
+      # CLI 不同命令读的认证变量名不一致（skill review 的登录检查读 TESSL_API_TOKEN，
+      # 见 tesslio/setup-tessl 未合并分支 fix/auth-token-env-alias），两个都设
       TESSL_TOKEN: ${{ secrets.TESSL_TOKEN }}
+      TESSL_API_TOKEN: ${{ secrets.TESSL_TOKEN }}
     steps:
       # Actions pin 到完整 commit SHA（tag 可变，存在供应链风险；SHA 由 tag 剥离得出）
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
