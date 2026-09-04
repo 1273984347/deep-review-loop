@@ -12,7 +12,7 @@ description: >-
 license: Apache-2.0
 compatibility: Requires filesystem + shell (PowerShell/POSIX) + file search (Grep/Read/LS); subagent/task spawning optional (degradation mode when absent). Shell-less web agents not supported.
 metadata:
-  version: "1.3.3"
+  version: "1.4.0"
 ---
 
 # Deep Review Loop
@@ -268,7 +268,21 @@ Output: priority decision + audit findings + memory sync status + verdict grep s
 只做研究，不改代码。
 ```
 
+#### 独立性边界（R1a/R1b/R2 适用，认知局限必读）
+
+subagent 隔离的是**上下文**，不是**认知**：R1a/R1b/R2 与主代理共享同一个 Base Model，模型级盲区（对同类问题的系统性误判）无法靠自审消除。由此三条铁律：
+
+- **证据独立是唯一的独立性来源**：每个 verifier 的证据必须来自自己的工具调用（自己 Grep / 自己 Read / 自己跑命令），转引其他 verifier 或主代理的命中结果视同证据缺失（对齐 R1a 硬性要求「禁止二手转述」）。结论一致但证据同源 → 按 1 票计，不算 3 票佐证。
+- **分歧必须升级**：verifier 结论冲突时禁止少数服从多数，升级为 file:line 级证据比对；无法裁决 → 降级为 residual risk 进出口 ACK 门禁，不允许仲裁者拍脑袋。
+- **人类是认知级盲区的唯一补偿**：出口 ACK 门禁（P1+ 必须人类确认）存在的根本原因即在此，不是流程仪式。
+
 ### R3 N residual risks（inline me，必走，≥3）+ 收敛曲线 + 过拟合警报
+
+**前置：严重度地板分（外部静态下界，必跑——双层严重度制的脚本层扩展）**：
+- 收敛判定前必跑 `python scripts/severity_score.py findings.jsonl`（纯 stdlib，确定性；输入 = R1a/R1b/R2 的 findings，每行 `{id, file, evidence, model_severity}`）
+- floor 规则：模型定性只可上调、不可低于地板（P0：凭据/数据丢失/安全控制移除信号；P1：崩溃 trace/测试失败/关键 TODO 信号）；`dispute=true`（模型定性低于地板）→ 地板生效 + 该条强制进 residual risk 清单
+- 任一 dispute 存在 → 本次收敛按「含 P1 残留」处理，P2 自动放行通道关闭，触发出口 ACK 门禁
+- 局限显式声明：地板分只覆盖可 Grep 的显性信号，是下界不是分类器；「无信号」不得作为降级依据
 
 **Residual risk 必含 3 类**：
 
@@ -345,7 +359,7 @@ Output: priority decision + audit findings + memory sync status + verdict grep s
 | **优先级** | 警报 A/B > 边际收益 gate > P2 超标。同时触发时按此顺序判定 |
 | **警报 A 与边际收益 gate 关系** | 边际收益 gate 采纳的残留导致的 P1/P2 持平不触发警报 A（例外条款）；未采纳的修复无效导致的持平仍触发警报 A |
 
-**出口 ACK 门禁**：DRL 收敛判定含「接受残留」或 P1 及以上残留 → 等待人类 `ACK + 风险接受` 才能视为闭环完成；仅 P2 残留 → 自动放行，但收尾报告标注「待确认项」。该门禁在作为子流程被 mem-wrap-up 调用时同样生效（Step 7 反向审查）。
+**出口 ACK 门禁**：DRL 收敛判定含「接受残留」或 P1 及以上残留，或存在严重度地板分 dispute → 等待人类 `ACK + 风险接受` 才能视为闭环完成；仅 P2 残留且无 dispute → 自动放行，但收尾报告标注「待确认项」。该门禁在作为子流程被 mem-wrap-up 调用时同样生效（Step 7 反向审查）。
 
 ---
 
@@ -428,6 +442,8 @@ Output: priority decision + audit findings + memory sync status + verdict grep s
 - 本 skill 修改必走 5 轮（meta-skill，per Scenario 5）
 - 收敛曲线必记（每轮 P0/P1/P2，标注假/真收敛）
 - **4 层过拟合防护必走**（P2 残留 N + 边际收益 gate + 过拟合警报 + 严重度门槛）
+- R3 前必跑严重度地板分（dispute 项必进 residual risk 并触发 ACK 门禁）
+- R1 独立性边界：证据各自采集，一致 ≠ 佐证；verifier 分歧升级证据比对
 
 ## 9. Reference
 
