@@ -8,6 +8,10 @@ on:
 jobs:
   validate:
     runs-on: ${{ matrix.os }}
+    env:
+      # Windows runners' Python stdout defaults to legacy codepages (cp1252);
+      # the lints print Chinese (verdict-ban list) — force UTF-8 on all OSes.
+      PYTHONUTF8: 1
     strategy:
       fail-fast: false
       matrix:

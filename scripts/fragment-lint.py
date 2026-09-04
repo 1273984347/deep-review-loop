@@ -16,6 +16,12 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
+# Windows consoles default to legacy codepages (cp1252/cp936); this lint prints
+# the Chinese verdict-ban list, so force UTF-8 output before any print.
+for _stream in (sys.stdout, sys.stderr):
+    if hasattr(_stream, "reconfigure"):
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+
 ROOT = Path(__file__).resolve().parents[1]
 
 # Canonical 7-word verdict ban (full order, shared across the three-skill loop).
