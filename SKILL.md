@@ -398,7 +398,7 @@ subagent 隔离的是**上下文**，不是**认知**：R1a/R1b/R2 与主代理�
 | 3 | 近期 topic | `<memory_root>/projects/<project-slug>/<date>/topics.md` | Read 工具看最新 |
 | 4 | 复利经验 | 项目内 retrospective 文档（如存在） | Grep 工具搜编号 |
 
-> **路径约定**：`<memory_root>` = agent 的 memory 根目录（按平台映射：TRAE `~/.trae-cn/memory`；Claude Code `%USERPROFILE%\.claude\projects`（Windows）/ `~/Library/Application Support/Claude/projects`（macOS）；WorkBuddy `~/.workbuddy/memory/` 或项目内 `.workbuddy/memory/`；无现成 memory 系统时在项目内建 `.agent-memory/`）；`<project-slug>` = 当前 workspace 对应的 memory 项目目录名。执行时按当前环境映射。若所用环境无 memory 系统，本步标 `not-applicable`，不编造证据。
+> **路径约定**：`<memory_root>` = agent 的 memory 根目录（按平台映射：TRAE `~/.trae-cn/memory`；Claude Code `%USERPROFILE%\.claude\projects`（Windows）/ `~/Library/Application Support/Claude/projects`（macOS）；WorkBuddy `~/.workbuddy/memory/` 或项目内 `.workbuddy/memory/`；ZCode `~/.zcode/cli/memories/projects/<project-slug>/memory/`；无现成 memory 系统时在项目内建 `.agent-memory/`）；`<project-slug>` = 当前 workspace 对应的 memory 项目目录名。执行时按当前环境映射。若所用环境无 memory 系统，本步标 `not-applicable`，不编造证据。
 > **路径预检（首次运行强制）**：用占位符前先验证路径存在（`test -e` / `Test-Path`）；预检失败 → 中断问用户，不允许猜路径继续。**Grep 空结果判别**：Grep 0 hits 时先用 `test -e` 区分「路径错误」与「真无匹配」，无法区分时标 `unverifiable` 询问用户，不得把空结果当通过。
 
 ### V5: 3-case dry-run（best / worst / null）
