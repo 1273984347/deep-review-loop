@@ -54,3 +54,16 @@ jobs:
 
       - name: Run shared-fragment consistency lint
         run: python scripts/fragment-lint.py
+
+  skill-hygiene:
+    name: skill hygiene gate (trigger / deadlink / copy consistency)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Node version
+        run: node --version
+      # CI 环境没有内置的 skill-creator ⇒ 用 --no-lint 跳过官方 lint 那一步；
+      # 官方 lint（skills-ref validate 与本地 lint-skill.js）由上面的 validate job 与本地门禁承担。
+      - name: Run skill hygiene gate
+        run: node scripts/hygiene/check_all.mjs --no-lint
