@@ -2,14 +2,17 @@
 name: deep-review-loop
 description: >-
   Enforces a 5-round deep review loop (R0-R3 + V1-V5) with anti-overfit protection for plans, specs,
-  skills, and long documents. Trigger when writing or modifying these artifacts, after batch fixes
-  (>10 items), when the user says "deep review / 复检 / 收敛 / DRL", or when false convergence is
-  suspected — even without explicit keywords. Do not trigger for one-off single-file edits with no
-  structural risk, plain coding/completion without written artifacts, or casual Q&A.
-  5 轮深度复检闭环（R0-R3 + V1-V5）+ 4 层过拟合防护。编写/修改方案、规范、skill、长文档时、批量修复
-  （>10 项）后、用户要求「复检/收敛/DRL」、或怀疑假收敛时触发（即使未点名）。
-  不触发：无结构风险的一次性单文件小改、不涉及书面产物的常规编码/补全、闲聊问答。
-license: Apache-2.0
+  skills, and long documents. Trigger when the user asks for a review pass — says
+  "deep review / 复检 / 收敛 / DRL / 重新审查", after a batch fix (>10 items) where a review is wanted,
+  or when false convergence is suspected. Do not trigger for one-off single-file edits with no structural
+  risk, plain coding/completion without written artifacts, or casual Q&A.
+  Do not trigger for session close-out or experience sedimentation (use mem-wrap-up / self-evolution),
+  nor for a full three-stage session close-out (use agent-session-loop).
+  5 轮深度复检闭环（R0-R3 + V1-V5）+ 4 层过拟合防护。审查对象是方案、规范、skill、长文档。
+  用户要求「复检/收敛/DRL/重新审查」、批量修复（>10 项）后需要审查、或怀疑假收敛时触发。
+  不触发：无结构风险的一次性单文件小改、不涉及书面产物的常规编码/补全、闲聊问答；
+  session 收尾与经验沉淀（用 mem-wrap-up / self-evolution）、完整三阶段闭环（用 agent-session-loop）。
+# license: Apache-2.0 —— 已移出 frontmatter（Mavis 不识别该键）；许可证全文见 repo/LICENSE
 compatibility: Requires filesystem + shell (PowerShell/POSIX) + file search (Grep/Read/LS); subagent/task spawning optional (degradation mode when absent). Shell-less web agents not supported.
 metadata:
   version: "1.4.0"
@@ -240,7 +243,7 @@ Output: refuted=true/false + findings list (含严重度分级) + class-level en
 - 违反处置：R2 审计时发现 R1b 违反硬性要求 → 该 finding 视为「未验证」，不计入收敛判定，要求重新派 R1b
 
 **双层严重度制（防 AI 自评操纵，对应反模式 4）**：
-- **结构性硬指标 → 脚本判定**（`evals/validate.py` / `scripts/version-lint.py` 等，CI 自动跑）：verdict 禁词命中、文件超限、residual 数量不足、版本四源不一致——这些不依赖语义判断，一律由脚本定 P1/P2，AI 无权改判。
+- **结构性硬指标 → 脚本判定**（仓库级 CI 脚本 `repo/evals/validate.py` 与包内 `scripts/version-lint.py` 等，CI 自动跑）：verdict 禁词命中、文件超限、residual 数量不足、版本四源不一致——这些不依赖语义判断，一律由脚本定 P1/P2，AI 无权改判。
 - **语义严重度 → AI 判定但附证据链**：架构/逻辑类缺陷的 P0-P3 由 AI 定级，但 P0/P1 判定和任何降级必须附**可复现证据链**（Grep/Read trace 到 file:line + 命令输出）；无证据链的降级视为「未验证」。
 - **处置**：脚本可判定的项，AI 声称「P2 可接受」但脚本检测为结构性违规 → 以脚本为准，标 P1 必须修复。
 
@@ -414,14 +417,16 @@ subagent 隔离的是**上下文**，不是**认知**：R1a/R1b/R2 与主代理�
 
 ---
 
-## 7. Trigger 场景（何时跑本 skill）
+## 7. 审查对象与时机（触发判定见 frontmatter description）
 
-- 任何 plan / spec / quickref / skill / long-doc 写完后
+- 审查对象：plan / spec / quickref / skill / long-doc
 - 批量修复（>10 项）后
 - user 说「deep review」「复检」「收敛」「DRL」时
 - 本 skill 自身修改后（meta-skill 闭环）
 - 怀疑假收敛时（强制重新审查）
 - **过拟合迹象**（越修越多 / 连续 3 轮不单调递减 / 回归率 >30%）时
+
+本节只列「审什么、什么时候审」；**该不该由哪个 skill 接手**的判定一律以 frontmatter description 为准。
 
 ---
 
