@@ -24,6 +24,8 @@ def read_version() -> str:
 def check_readme(v: str) -> None:
     readme = ROOT / "README.md"
     if not readme.exists():
+        readme = ROOT / "repo" / "README.md"   # 批 D：人类文档归档区
+    if not readme.exists():
         print("SKIP: README.md not found")
         return
     text = readme.read_text(encoding="utf-8")
@@ -33,6 +35,8 @@ def check_readme(v: str) -> None:
 
 def check_changelog(v: str) -> None:
     cl = ROOT / "CHANGELOG.md"
+    if not cl.exists():
+        cl = ROOT / "repo" / "CHANGELOG.md"   # 批 D：人类文档归档区
     if not cl.exists():
         print("SKIP: CHANGELOG.md not found")
         return

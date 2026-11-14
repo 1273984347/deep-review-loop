@@ -4,6 +4,15 @@
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-09-05
+
+### Added
+- 独立性边界（R1a/R1b/R2 适用）：subagent 隔离的是上下文不是认知——证据独立是唯一独立性来源（各自采集，转引视同证据缺失）、一致但证据同源按 1 票计、verifier 分歧升级为 file:line 证据比对、出口 ACK 门禁是认知级盲区的唯一补偿
+- 严重度地板分 `scripts/severity_score.py`（外部静态下界，纯 stdlib，双层严重度制的脚本层扩展）：模型定性可上调不可低于地板（P0 凭据/数据丢失/安全控制移除信号、P1 崩溃 trace/测试失败/关键 TODO 信号）；dispute 项强制进 residual risk 并触发出口 ACK 门禁（P2 自动放行通道关闭）；局限显式声明——地板分是下界不是分类器，无信号不得作为降级依据
+
+### Changed
+- Self-Disclosure 增严重度地板分与独立性边界两行；出口 ACK 门禁触发条件增 dispute 分支
+
 ## [1.3.3] - 2026-09-04
 
 ### Fixed

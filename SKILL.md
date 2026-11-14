@@ -2,17 +2,20 @@
 name: deep-review-loop
 description: >-
   Enforces a 5-round deep review loop (R0-R3 + V1-V5) with anti-overfit protection for plans, specs,
-  skills, and long documents. Trigger when writing or modifying these artifacts, after batch fixes
-  (>10 items), when the user says "deep review / 复检 / 收敛 / DRL", or when false convergence is
-  suspected — even without explicit keywords. Do not trigger for one-off single-file edits with no
-  structural risk, plain coding/completion without written artifacts, or casual Q&A.
-  5 轮深度复检闭环（R0-R3 + V1-V5）+ 4 层过拟合防护。编写/修改方案、规范、skill、长文档时、批量修复
-  （>10 项）后、用户要求「复检/收敛/DRL」、或怀疑假收敛时触发（即使未点名）。
-  不触发：无结构风险的一次性单文件小改、不涉及书面产物的常规编码/补全、闲聊问答。
-license: Apache-2.0
+  skills, and long documents. Trigger when the user asks for a review pass — says
+  "deep review / 复检 / 收敛 / DRL / 重新审查", after a batch fix (>10 items) where a review is wanted,
+  or when false convergence is suspected. Do not trigger for one-off single-file edits with no structural
+  risk, plain coding/completion without written artifacts, or casual Q&A.
+  Do not trigger for session close-out or experience sedimentation (use mem-wrap-up / self-evolution),
+  nor for a full three-stage session close-out (use agent-session-loop).
+  5 轮深度复检闭环（R0-R3 + V1-V5）+ 4 层过拟合防护。审查对象是方案、规范、skill、长文档。
+  用户要求「复检/收敛/DRL/重新审查」、批量修复（>10 项）后需要审查、或怀疑假收敛时触发。
+  不触发：无结构风险的一次性单文件小改、不涉及书面产物的常规编码/补全、闲聊问答；
+  session 收尾与经验沉淀（用 mem-wrap-up / self-evolution）、完整三阶段闭环（用 agent-session-loop）。
+# license: Apache-2.0 —— 已移出 frontmatter（Mavis 不识别该键）；许可证全文见 repo/LICENSE
 compatibility: Requires filesystem + shell (PowerShell/POSIX) + file search (Grep/Read/LS); subagent/task spawning optional (degradation mode when absent). Shell-less web agents not supported.
 metadata:
-  version: "1.3.3"
+  version: "1.4.0"
 ---
 
 # Deep Review Loop
@@ -240,7 +243,7 @@ Output: refuted=true/false + findings list (含严重度分级) + class-level en
 - 违反处置：R2 审计时发现 R1b 违反硬性要求 → 该 finding 视为「未验证」，不计入收敛判定，要求重新派 R1b
 
 **双层严重度制（防 AI 自评操纵，对应反模式 4）**：
-- **结构性硬指标 → 脚本判定**（`evals/validate.py` / `scripts/version-lint.py` 等，CI 自动跑）：verdict 禁词命中、文件超限、residual 数量不足、版本四源不一致——这些不依赖语义判断，一律由脚本定 P1/P2，AI 无权改判。
+- **结构性硬指标 → 脚本判定**（仓库级 CI 脚本 `repo/evals/validate.py` 与包内 `scripts/version-lint.py` 等，CI 自动跑）：verdict 禁词命中、文件超限、residual 数量不足、版本四源不一致——这些不依赖语义判断，一律由脚本定 P1/P2，AI 无权改判。
 - **语义严重度 → AI 判定但附证据链**：架构/逻辑类缺陷的 P0-P3 由 AI 定级，但 P0/P1 判定和任何降级必须附**可复现证据链**（Grep/Read trace 到 file:line + 命令输出）；无证据链的降级视为「未验证」。
 - **处置**：脚本可判定的项，AI 声称「P2 可接受」但脚本检测为结构性违规 → 以脚本为准，标 P1 必须修复。
 
@@ -268,7 +271,21 @@ Output: priority decision + audit findings + memory sync status + verdict grep s
 只做研究，不改代码。
 ```
 
+#### 独立性边界（R1a/R1b/R2 适用，认知局限必读）
+
+subagent 隔离的是**上下文**，不是**认知**：R1a/R1b/R2 与主代理共享同一个 Base Model，模型级盲区（对同类问题的系统性误判）无法靠自审消除。由此三条铁律：
+
+- **证据独立是唯一的独立性来源**：每个 verifier 的证据必须来自自己的工具调用（自己 Grep / 自己 Read / 自己跑命令），转引其他 verifier 或主代理的命中结果视同证据缺失（对齐 R1a 硬性要求「禁止二手转述」）。结论一致但证据同源 → 按 1 票计，不算 3 票佐证。
+- **分歧必须升级**：verifier 结论冲突时禁止少数服从多数，升级为 file:line 级证据比对；无法裁决 → 降级为 residual risk 进出口 ACK 门禁，不允许仲裁者拍脑袋。
+- **人类是认知级盲区的唯一补偿**：出口 ACK 门禁（P1+ 必须人类确认）存在的根本原因即在此，不是流程仪式。
+
 ### R3 N residual risks（inline me，必走，≥3）+ 收敛曲线 + 过拟合警报
+
+**前置：严重度地板分（外部静态下界，必跑——双层严重度制的脚本层扩展）**：
+- 收敛判定前必跑 `python scripts/severity_score.py findings.jsonl`（纯 stdlib，确定性；输入 = R1a/R1b/R2 的 findings，每行 `{id, file, evidence, model_severity}`）
+- floor 规则：模型定性只可上调、不可低于地板（P0：凭据/数据丢失/安全控制移除信号；P1：崩溃 trace/测试失败/关键 TODO 信号）；`dispute=true`（模型定性低于地板）→ 地板生效 + 该条强制进 residual risk 清单
+- 任一 dispute 存在 → 本次收敛按「含 P1 残留」处理，P2 自动放行通道关闭，触发出口 ACK 门禁
+- 局限显式声明：地板分只覆盖可 Grep 的显性信号，是下界不是分类器；「无信号」不得作为降级依据
 
 **Residual risk 必含 3 类**：
 
@@ -345,7 +362,7 @@ Output: priority decision + audit findings + memory sync status + verdict grep s
 | **优先级** | 警报 A/B > 边际收益 gate > P2 超标。同时触发时按此顺序判定 |
 | **警报 A 与边际收益 gate 关系** | 边际收益 gate 采纳的残留导致的 P1/P2 持平不触发警报 A（例外条款）；未采纳的修复无效导致的持平仍触发警报 A |
 
-**出口 ACK 门禁**：DRL 收敛判定含「接受残留」或 P1 及以上残留 → 等待人类 `ACK + 风险接受` 才能视为闭环完成；仅 P2 残留 → 自动放行，但收尾报告标注「待确认项」。该门禁在作为子流程被 mem-wrap-up 调用时同样生效（Step 7 反向审查）。
+**出口 ACK 门禁**：DRL 收敛判定含「接受残留」或 P1 及以上残留，或存在严重度地板分 dispute → 等待人类 `ACK + 风险接受` 才能视为闭环完成；仅 P2 残留且无 dispute → 自动放行，但收尾报告标注「待确认项」。该门禁在作为子流程被 mem-wrap-up 调用时同样生效（Step 7 反向审查）。
 
 ---
 
@@ -384,7 +401,7 @@ Output: priority decision + audit findings + memory sync status + verdict grep s
 | 3 | 近期 topic | `<memory_root>/projects/<project-slug>/<date>/topics.md` | Read 工具看最新 |
 | 4 | 复利经验 | 项目内 retrospective 文档（如存在） | Grep 工具搜编号 |
 
-> **路径约定**：`<memory_root>` = agent 的 memory 根目录（按平台映射：TRAE `~/.trae-cn/memory`；Claude Code `%USERPROFILE%\.claude\projects`（Windows）/ `~/Library/Application Support/Claude/projects`（macOS）；WorkBuddy `~/.workbuddy/memory/` 或项目内 `.workbuddy/memory/`；无现成 memory 系统时在项目内建 `.agent-memory/`）；`<project-slug>` = 当前 workspace 对应的 memory 项目目录名。执行时按当前环境映射。若所用环境无 memory 系统，本步标 `not-applicable`，不编造证据。
+> **路径约定**：`<memory_root>` = agent 的 memory 根目录（按平台映射：TRAE `~/.trae-cn/memory`；Claude Code `%USERPROFILE%\.claude\projects`（Windows）/ `~/Library/Application Support/Claude/projects`（macOS）；WorkBuddy `~/.workbuddy/memory/` 或项目内 `.workbuddy/memory/`；ZCode `~/.zcode/cli/memories/projects/<project-slug>/memory/`；无现成 memory 系统时在项目内建 `.agent-memory/`）；`<project-slug>` = 当前 workspace 对应的 memory 项目目录名。执行时按当前环境映射。若所用环境无 memory 系统，本步标 `not-applicable`，不编造证据。
 > **路径预检（首次运行强制）**：用占位符前先验证路径存在（`test -e` / `Test-Path`）；预检失败 → 中断问用户，不允许猜路径继续。**Grep 空结果判别**：Grep 0 hits 时先用 `test -e` 区分「路径错误」与「真无匹配」，无法区分时标 `unverifiable` 询问用户，不得把空结果当通过。
 
 ### V5: 3-case dry-run（best / worst / null）
@@ -400,14 +417,16 @@ Output: priority decision + audit findings + memory sync status + verdict grep s
 
 ---
 
-## 7. Trigger 场景（何时跑本 skill）
+## 7. 审查对象与时机（触发判定见 frontmatter description）
 
-- 任何 plan / spec / quickref / skill / long-doc 写完后
+- 审查对象：plan / spec / quickref / skill / long-doc
 - 批量修复（>10 项）后
 - user 说「deep review」「复检」「收敛」「DRL」时
 - 本 skill 自身修改后（meta-skill 闭环）
 - 怀疑假收敛时（强制重新审查）
 - **过拟合迹象**（越修越多 / 连续 3 轮不单调递减 / 回归率 >30%）时
+
+本节只列「审什么、什么时候审」；**该不该由哪个 skill 接手**的判定一律以 frontmatter description 为准。
 
 ---
 
@@ -428,6 +447,8 @@ Output: priority decision + audit findings + memory sync status + verdict grep s
 - 本 skill 修改必走 5 轮（meta-skill，per Scenario 5）
 - 收敛曲线必记（每轮 P0/P1/P2，标注假/真收敛）
 - **4 层过拟合防护必走**（P2 残留 N + 边际收益 gate + 过拟合警报 + 严重度门槛）
+- R3 前必跑严重度地板分（dispute 项必进 residual risk 并触发 ACK 门禁）
+- R1 独立性边界：证据各自采集，一致 ≠ 佐证；verifier 分歧升级证据比对
 
 ## 9. Reference
 
